@@ -19,7 +19,8 @@ export class AppComponent {
 
   testTasks = [
     'Allow changing the status of the Tasks',
-    'Remove Tasks with a button'
+    'Remove Tasks with a button',
+    'Remove duplicated code'
   ];
 
   doneTasks = [
