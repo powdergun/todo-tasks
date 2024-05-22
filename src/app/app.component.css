@@ -1,0 +1,26 @@
+h2 {
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    /* flex-direction: row; */
+    height: fit-content;
+  }
+  
+.box {
+    flex: 1;
+    display: inline-block;
+    /* flex-direction: column; */
+    border: 3px inset grey;
+    box-sizing: border-box;
+}
+
+.box:hover {
+    flex: 1;
+    display: inline-block;
+    /* flex-direction: column; */
+    border: 3px dotted goldenrod;
+    box-sizing: border-box;
+    background-color: rgb(241, 224, 224);
+}
