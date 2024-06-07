@@ -1,4 +1,6 @@
-import { Component, Input, HostListener } from '@angular/core';
+import { Component, Input, HostListener, inject } from '@angular/core';
+import { TasksService } from './task/tasks.service';
+import { Task } from './task/tasks.model';
 
 @Component({
   selector: 'shared-tasks',
@@ -6,8 +8,6 @@ import { Component, Input, HostListener } from '@angular/core';
   styleUrls: ['./tasks.component.css']
 })
 export class TasksComponent {
-  @Input() statusList = [];
-  @Input() otherLists = [];
   @Input() statuses = [];
   @Input() theStatus = '';
   @Input() isHovered:boolean;
@@ -17,17 +17,27 @@ export class TasksComponent {
   isMoving = false;
   isTaskHovered = false;
 
-  editedTaskIndex: number = -1;
-  movedTaskIndex: number = -1;
+  editedTaskIndex:string = '';
+  movedTaskIndex:string = '';
 
-  handleEnter(event: Event) {
+  private taskService = inject(TasksService);
+
+  get tasksByStatus() {
+    return this.taskService.getTasksByStatus(this.theStatus);
+  }
+
+  handleEnter(taskId: string, event: Event) {
     let input = (<HTMLInputElement>event.target).value;
     if (this.isCreating) {
       if (input != '' && input != null) {
-        this.statusList.unshift(input);
+        this.taskService.addTask({
+          id: null,
+          status: this.theStatus,
+          text: input
+        })
       }
     } else if (this.isEditing) {
-      this.statusList[this.editedTaskIndex] = input;
+      this.taskService.editTask('text', taskId, input);
     }
 
     this.isCreating = false;
@@ -35,27 +45,22 @@ export class TasksComponent {
     input = '';
   }
 
-  handleErase(index: number) {
-    this.statusList.splice(index, 1);
+  handleErase(taskId: string) {
+    this.taskService.removeTask(taskId);
     this.isCreating = false;
     this.isEditing = false;
     this.isMoving = false;
   }
 
-  handleMove(taskIndex: number, statusIndex: number) {
-    console.log(this.otherLists);
+  handleMove(statusIndex: number) {
     this.isMoving = false;
     if (statusIndex === 0) {
-      console.log(this.otherLists[0]);
-      this.otherLists[0].unshift(this.statusList[taskIndex]);
-      console.log(this.otherLists[0]);
+      this.taskService.editTask('status', this.movedTaskIndex, this.statuses[0]);
     } else if (statusIndex === 1) {
-      this.otherLists[1].unshift(this.statusList[taskIndex]);
+      this.taskService.editTask('status', this.movedTaskIndex, this.statuses[1]);
     } else {
-      this.otherLists[2].unshift(this.statusList[taskIndex]);
+      this.taskService.editTask('status', this.movedTaskIndex, this.statuses[2]);
     }
-
-    this.statusList.splice(taskIndex, 1);
   }
 
   handleCancel(event: Event) {
@@ -68,24 +73,24 @@ export class TasksComponent {
     this.isCreating = true;
   }
 
-  handleEdit(index: number, oldText: string) {
+  handleEdit(task:Task) {
     this.isEditing = true;
-    this.editedTaskIndex = index;
+    this.editedTaskIndex = task.id;
 
-    this.currentTaskDescription = oldText;
+    this.currentTaskDescription = task.text;
   }
 
-  handleEditStatus(index: number) {
-    if (this.movedTaskIndex == -1) {
+  handleEditStatus(taskId: string) {
+    if (this.movedTaskIndex == '') {
       this.isMoving = true;
-    } else if (this.movedTaskIndex == index) {
+    } else if (this.movedTaskIndex == taskId) {
       this.isMoving = !this.isMoving;
-    } else if (this.movedTaskIndex != index) {
+    } else if (this.movedTaskIndex != taskId) {
       this.isMoving = false;
       this.isMoving = true;
     }
 
-    this.movedTaskIndex = index;
+    this.movedTaskIndex = taskId;
   }
 
   handleBlur(event: Event) {

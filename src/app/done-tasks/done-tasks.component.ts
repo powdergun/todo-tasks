@@ -7,22 +7,11 @@ import { TasksComponent } from '../tasks/tasks.component';
   styleUrls: ['../tasks/tasks.component.css', './done-tasks.component.css']
 })
 export class DoneTasksComponent extends TasksComponent {
-  @Input() todoTasks: string[] = [];
-  @Input() progressTasks: string[] = [];
-  @Input() testTasks: string[] = [];
-  @Input() doneTasks: string[] = [];
-  statuses = ['To Do', 'In Progress', 'In Test'];
-  otherLists = [this.todoTasks, this.progressTasks, this.testTasks];
+  statuses = ['To Do', 'In Progress', 'In Testing'];
   isHovered = false;
 
   constructor() {
     super();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.todoTasks || changes.progressTasks || changes.testTasks || changes.doneTasks) {
-      this.otherLists = [this.todoTasks, this.progressTasks, this.testTasks];
-    }
   }
 
   @HostListener('mouseenter') onMouseEnter() {
